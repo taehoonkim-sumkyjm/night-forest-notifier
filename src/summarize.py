@@ -3,7 +3,7 @@ import json
 import os
 import re
 
-from common import http
+from common import ROOT, http, load_json
 
 SYSTEM = (
     "너는 로블록스 게임 '99 Nights in the Forest'(99일 야간숲)의 소식을 한국 부모에게 전하는 도우미다. "
@@ -54,7 +54,11 @@ def summarize(items, model):
                     results[r["id"]] = r
             except Exception as e:
                 print("요약 실패(원문으로 대체):", e)
+    manual = load_json(ROOT / "translations.json", {})  # 사람이(또는 클로드가) 직접 번역해 둔 항목
     for it in items:
+        m = manual.get(it["id"])
+        if m and it["id"] not in results:
+            results[it["id"]] = m
         r = results.get(it["id"])
         if r and r.get("summary"):
             it["title_ko"] = r.get("title") or it["title"]

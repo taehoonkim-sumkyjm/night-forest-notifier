@@ -101,6 +101,12 @@ def main():
             site_items.insert(0, {k: it.get(k) for k in (
                 "id", "kind", "title", "title_ko", "summary", "tip", "translated",
                 "date", "source", "level", "url", "video")})
+    # 직접 번역해 둔 항목(translations.json)은 이미 사이트에 올라간 영어 카드도 한국어로 바꿔 준다.
+    manual = load_json(ROOT / "translations.json", {})
+    for it in site_items:
+        m = manual.get(it["id"])
+        if m:
+            it["title_ko"], it["summary"], it["tip"], it["translated"] = m["title"], m["summary"], m["tip"], True
     site_items.sort(key=lambda x: x["date"] or "", reverse=True)
     site_items = site_items[: cfg["site_keep_items"]]
     generated = now.strftime("%Y-%m-%d %H:%M")

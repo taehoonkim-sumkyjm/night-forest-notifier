@@ -1,6 +1,7 @@
 """카카오톡 '나에게 보내기'. 텍스트 템플릿은 200자 제한이 있어 건별로 줄여서 보낸다."""
 import json
 import os
+import unicodedata
 from pathlib import Path
 
 from common import ROOT, http
@@ -9,19 +10,36 @@ TAGS = {"badge": "신규 배지", "patch": "패치", "code": "코드"}
 LIMIT = 200
 
 
+def _env(name):
+    """비밀값을 읽을 때 공백·줄바꿈·보이지 않는 글자를 모두 제거한다 (복사할 때 딸려 들어오는 경우가 많다)."""
+    v = os.environ.get(name, "")
+    return "".join(ch for ch in v if unicodedata.category(ch)[0] not in "CZ")
+
+
+def _diagnose(name):
+    """값은 숨기고 길이와 이상한 글자 유무만 출력한다."""
+    raw = os.environ.get(name, "")
+    clean = _env(name)
+    odd = len(raw) - len(clean)
+    nonascii = any(ord(ch) > 127 for ch in clean)
+    print(f"[점검] {name}: 길이 {len(clean)}자, 제거된 이상한 글자 {odd}개, 한글·특수문자 포함 {'예' if nonascii else '아니오'}")
+
+
 def configured():
-    return bool(os.environ.get("KAKAO_REST_API_KEY") and os.environ.get("KAKAO_REFRESH_TOKEN"))
+    return bool(_env("KAKAO_REST_API_KEY") and _env("KAKAO_REFRESH_TOKEN"))
 
 
 def get_access_token():
     """리프레시 토큰으로 액세스 토큰을 새로 받는다. 새 리프레시 토큰이 오면 파일로 남긴다."""
+    for n in ("KAKAO_REST_API_KEY", "KAKAO_REFRESH_TOKEN", "KAKAO_CLIENT_SECRET"):
+        _diagnose(n)
     data = {
         "grant_type": "refresh_token",
-        "client_id": os.environ["KAKAO_REST_API_KEY"],
-        "refresh_token": os.environ["KAKAO_REFRESH_TOKEN"],
+        "client_id": _env("KAKAO_REST_API_KEY"),
+        "refresh_token": _env("KAKAO_REFRESH_TOKEN"),
     }
-    if os.environ.get("KAKAO_CLIENT_SECRET"):
-        data["client_secret"] = os.environ["KAKAO_CLIENT_SECRET"]
+    if _env("KAKAO_CLIENT_SECRET"):
+        data["client_secret"] = _env("KAKAO_CLIENT_SECRET")
     status, body = http("https://kauth.kakao.com/oauth/token", data=data, method="POST")
     res = json.loads(body)
     if status != 200 or "access_token" not in res:

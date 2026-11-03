@@ -1,0 +1,13 @@
+{
+  "game_name": "99일 야간숲",
+  "universe_id": 7326934954,
+  "root_place_id": 79546208627805,
+  "wiki_api": "https://99-nights-in-the-forest.fandom.com/api.php",
+  "wiki_update_log_title": "Update_Log",
+  "wiki_codes_title": "Codes",
+  "badge_fetch_limit": 30,
+  "youtube_channel_ids": [],
+  "max_items_per_message_batch": 8,
+  "site_keep_items": 300,
+  "summary_model": "claude-haiku-5-5"
+}

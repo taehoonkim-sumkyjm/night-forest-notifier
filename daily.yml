@@ -1,0 +1,83 @@
+name: daily
+
+on:
+  schedule:
+    - cron: "30 21 * * *"   # 매일 한국 시간 06:30 (UTC 21:30). GitHub 사정으로 몇 분~수십 분 늦을 수 있어요.
+  workflow_dispatch:
+    inputs:
+      test_kakao:
+        description: "카카오톡 테스트 메시지만 보내기"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: daily
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    env:
+      KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+      KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
+      KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      SITE_URL: ${{ vars.SITE_URL }}
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 카카오톡 테스트 메시지
+        if: ${{ github.event.inputs.test_kakao == 'true' }}
+        run: python src/main.py --test-kakao
+
+      - name: 소식 확인·전송·사이트 만들기
+        id: run
+        if: ${{ github.event.inputs.test_kakao != 'true' }}
+        run: python src/main.py
+        continue-on-error: true
+
+      - name: 카카오 리프레시 토큰 갱신 저장
+        if: ${{ github.event.inputs.test_kakao != 'true' && hashFiles('out/new_refresh_token.txt') != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          if [ -n "$GH_TOKEN" ]; then
+            gh secret set KAKAO_REFRESH_TOKEN --body "$(cat out/new_refresh_token.txt)" --repo "$GITHUB_REPOSITORY"
+          else
+            echo "GH_PAT 이 없어 리프레시 토큰 자동 갱신은 건너뜀"
+          fi
+
+      - name: 상태·사이트 저장
+        if: ${{ github.event.inputs.test_kakao != 'true' }}
+        run: |
+          git config user.name "night-forest-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add state docs
+          git diff --cached --quiet || (git commit -m "daily update" && git push)
+
+      - uses: actions/upload-pages-artifact@v3
+        if: ${{ github.event.inputs.test_kakao != 'true' }}
+        with:
+          path: docs
+      - name: 웹사이트 게시
+        id: deploy
+        if: ${{ github.event.inputs.test_kakao != 'true' }}
+        uses: actions/deploy-pages@v4
+
+      - name: 실행 결과 확인
+        if: ${{ steps.run.outcome == 'failure' }}
+        run: |
+          echo "소식 확인 단계에서 오류가 있었어요. 위 로그를 확인하세요."
+          exit 1

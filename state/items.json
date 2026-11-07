@@ -1,5 +1,19 @@
 [
   {
+    "id": "code:8a018d8d90",
+    "kind": "code",
+    "title": "코드 목록에 변경이 있어요",
+    "title_ko": "코드 목록에 변경이 있어요",
+    "summary": "style=\"border:2px solid #4971B6;text-align:center;\"|<center>Active</center>",
+    "tip": "원문 요약이 되지 않았어요. 링크에서 직접 확인해 주세요.",
+    "translated": false,
+    "date": "2026-11-08",
+    "source": "팬 위키 코드 문서",
+    "level": "wiki",
+    "url": "https://99-nights-in-the-forest.fandom.com/wiki/Codes",
+    "video": null
+  },
+  {
     "id": "patch:2026-10-31:Hedge Maze Refresh",
     "kind": "patch",
     "title": "Hedge Maze Refresh",

@@ -152,5 +152,19 @@
     "level": "official",
     "url": "https://www.roblox.com/badges/3756043345796647",
     "video": null
+  },
+  {
+    "id": "badge:478327979068041",
+    "kind": "badge",
+    "title": "Scholarship",
+    "title_ko": "Scholarship",
+    "summary": "Use a stone tablet to upgrade an item in the crafting bench",
+    "tip": "원문 요약이 되지 않았어요. 링크에서 직접 확인해 주세요.",
+    "translated": false,
+    "date": "2026-01-17",
+    "source": "로블록스 공식 배지 목록",
+    "level": "official",
+    "url": "https://www.roblox.com/badges/478327979068041",
+    "video": null
   }
 ]

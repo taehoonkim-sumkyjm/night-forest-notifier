@@ -1,5 +1,19 @@
 [
   {
+    "id": "patch:2026-11-14:Halloween is Over",
+    "kind": "patch",
+    "title": "Halloween is Over",
+    "title_ko": "Halloween is Over",
+    "summary": "Halloween is over, this week removes all of the Halloween content. We have also been working on some bug fixes: * DLC added for season 2 mer…",
+    "tip": "원문 요약이 되지 않았어요. 링크에서 직접 확인해 주세요.",
+    "translated": false,
+    "date": "2026-11-14",
+    "source": "팬 위키 업데이트 로그",
+    "level": "wiki",
+    "url": "https://99-nights-in-the-forest.fandom.com/wiki/Update_Log",
+    "video": null
+  },
+  {
     "id": "code:8a018d8d90",
     "kind": "code",
     "title": "코드 목록에 변경이 있어요",
